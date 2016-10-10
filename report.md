@@ -24,7 +24,7 @@ always @(posedge (clk & wrenable)) begin
 end
 ```
 #### Structural equivalant for the above register implementations
-![Schematic for Deliverable 1](https://github.com/iangmhill/HW4/blob/master/images/deliverable1.jpg "Schematic for Deliverable 1")
+![Schematic for Deliverable 1](./images/deliverable1.jpg "Schematic for Deliverable 1")
 
 
 
