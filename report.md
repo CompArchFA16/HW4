@@ -1,6 +1,32 @@
 ### Deliverable 1
 
-// todo
+#### Method 1
+```verilog
+module register
+(
+output reg  q,
+input       d,
+input       wrenable,
+input       clk
+);
+    always @(posedge clk) begin
+        if(wrenable) begin
+            q = d;
+        end
+    end
+endmodule
+```
+
+#### Method 2
+```verilog
+always @(posedge (clk & wrenable)) begin
+    q = d;
+end
+```
+#### Structural equivalant for the above register implementations
+![Schematic for Deliverable 1](https://github.com/iangmhill/HW4/blob/master/images/deliverable1.jpg "Schematic for Deliverable 1")
+
+
 
 ### Deliverable 6
 
