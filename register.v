@@ -16,43 +16,70 @@ input		clk
 endmodule
 
 module register32
+//parameterizing as reccomended in lab
+#(parameter a=32, parameter b=a-1)
 // same module register as above but have 32 registers
 (
-output[31:0] reg q,
-input[31:0] 	 d,
+output reg[b:0] q,
+input[b:0] 	 d,
 input			 wrenable,
 input			 clk
 );
 
-wire[5:0] i;	//indexing used in for loop
+// is making an index variable like this legal?
+//wire[5:0] i;	//indexing used in for loop
+// generate
+// 	genvar i;
+// // what does it mean parameterizing this width?
+// 	always @(posedge clk) begin
+// 		if (wrenable) begin
+// 			for (i=6'b000000; i<6'b100000; i=i+1) begin: q_to_d
+// 				q[i] = d[i];
+// 			end
+// 		end
+
+
+// 	end
+// endgenerate
 
 	always @(posedge clk) begin
 		if (wrenable) begin
-			for (i=6'b000000, i<6'b100000, i=i+1) begin:
-				q[i] = d[i];
+				q = d;
 			end
-		end
-
 	end
+
+
 endmodule
 
 module register32zero
+#(parameter a=32, parameter b=a-1)
 // same module register as above but have 32 registers
+// outputs only zeros
 (
-output[31:0] reg q,
+output reg[31:0] q,
 input[31:0] 	 d,
 input			 wrenable,
 input			 clk
 );
 
-wire[5:0] i;	//indexing used in for loop
+// generate
+// 	genvar i;
+// // what does it mean parameterizing this width?
+// 	always @(posedge clk) begin
+// 		if (wrenable) begin
+// 			for (i=6'b000000; i<6'b100000; i=i+1) begin: q_to_d
+// 				q[i] = 1'b0;
+// 			end
+// 		end
+
+
+// 	end
+// endgenerate
 
 	always @(posedge clk) begin
 		if (wrenable) begin
-			for (i=6'b000000, i<6'b100000, i=i+1) begin:
-				q[i] = 0;
+				q = {b{1'b0}};
 			end
-		end
-
 	end
 endmodule
+

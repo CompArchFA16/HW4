@@ -3,6 +3,11 @@
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
 
+`include "decoders.v"
+`include "register.v"
+`include "multiplexers.v"
+`include "regfile.v"
+
 module hw4testbenchharness();
 
   wire[31:0]	ReadData1;	// Data from first register read
