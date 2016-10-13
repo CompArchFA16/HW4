@@ -1,7 +1,21 @@
+/*Expand the provided test bench to classify the following register files:
+
+A fully perfect register file. Return True when this is detected, false for all others.
+Write Enable is broken / ignored – Register is always written to.
+Decoder is broken – All registers are written to.
+Register Zero is actually a register instead of the constant value zero.
+Port 2 is broken and always reads register 17.
+These will be graded by instantiating intentionally broken register files with your tester. Your tester must return true (works!) or false (broken!) as appropriate.
+
+It is to your advantage to test more than just these cases to better ensure that your good register file is actually good.  */
+
+
 //------------------------------------------------------------------------------
-// Test harness validates hw4testbench by connecting it to various functional 
+// Test harness validates hw4testbench by connecting it to various functional
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
+`include "regfile.v"
+`include "register.v"
 
 module hw4testbenchharness();
 
@@ -16,10 +30,37 @@ module hw4testbenchharness();
 
   reg		begintest;	// Set High to begin testing register file
   wire		dutpassed;	// Indicates whether register file passed tests
+  wire      endtest;
 
   // Instantiate the register file being tested.  DUT = Device Under Test
-  regfile DUT
+  // regfile DUT
+  // (
+  //   .ReadData1(ReadData1),
+  //   .ReadData2(ReadData2),
+  //   .WriteData(WriteData),
+  //   .ReadRegister1(ReadRegister1),
+  //   .ReadRegister2(ReadRegister2),
+  //   .WriteRegister(WriteRegister),
+  //   .RegWrite(RegWrite),
+  //   .Clk(Clk)
+  // );
+
+
+//Uncomment below and comment regfile DUT (above) to test the register32 module
+  register32 DUT
   (
+    .q(ReadData1),
+    .d(WriteData),
+    .wrenable(RegWrite),
+    .clk(Clk)
+  );
+
+  // Instantiate test bench to test the DUT
+  hw4testbench tester
+  (
+    .begintest(begintest),
+    .endtest(endtest),
+    .dutpassed(dutpassed),
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
     .WriteData(WriteData),
@@ -27,22 +68,6 @@ module hw4testbenchharness();
     .ReadRegister2(ReadRegister2),
     .WriteRegister(WriteRegister),
     .RegWrite(RegWrite),
-    .Clk(Clk)
-  );
-
-  // Instantiate test bench to test the DUT
-  hw4testbench tester
-  (
-    .begintest(begintest),
-    .endtest(endtest), 
-    .dutpassed(dutpassed),
-    .ReadData1(ReadData1),
-    .ReadData2(ReadData2),
-    .WriteData(WriteData), 
-    .ReadRegister1(ReadRegister1), 
-    .ReadRegister2(ReadRegister2),
-    .WriteRegister(WriteRegister),
-    .RegWrite(RegWrite), 
     .Clk(Clk)
   );
 
@@ -107,7 +132,7 @@ output reg		Clk
     dutpassed = 1;
     #10
 
-  // Test Case 1: 
+  // Test Case 1:
   //   Write '42' to register 2, verify with Read Ports 1 and 2
   //   (Passes because example register file is hardwired to return 42)
   WriteRegister = 5'd2;
@@ -123,7 +148,7 @@ output reg		Clk
     $display("Test Case 1 Failed");
   end
 
-  // Test Case 2: 
+  // Test Case 2:
   //   Write '15' to register 2, verify with Read Ports 1 and 2
   //   (Fails with example register file, but should pass with yours)
   WriteRegister = 5'd2;
