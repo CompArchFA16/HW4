@@ -56,8 +56,8 @@ module register32zero
 // same module register as above but have 32 registers
 // outputs only zeros
 (
-output reg[31:0] q,
-input[31:0] 	 d,
+output reg[b:0] q,
+input[b:0] 	 d,
 input			 wrenable,
 input			 clk
 );
