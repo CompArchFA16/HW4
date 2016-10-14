@@ -1,5 +1,5 @@
-// 32-bit D Flip-Flop with enable
-// Positive edge triggered
+// 32-bit D Flip-Flop with enable, positive edge triggered
+// Also includes zero register
 
 `include "register.v"
 
@@ -19,5 +19,19 @@ module register32
             register _register(q[i], d[i], wrenable, clk);
         end
     endgenerate
+
+endmodule
+
+module register32zero
+(
+    output [31:0] q,
+    input [31:0] d,
+    input wrenable,
+    input clk
+);
+    wire [31:0] d;
+    wire wrenable, clk;
+
+    assign q = 32'd0;
 
 endmodule
