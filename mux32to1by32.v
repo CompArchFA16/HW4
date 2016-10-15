@@ -1,46 +1,46 @@
 module mux32to1by32
 (
-  output[31:0]    out,
-  input[4:0]      address,
-  input[31:0]     inputs
+  output[31:0] out,
+  input[4:0]   address,
+  input[31:0]  input0, input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20, input21, input22, input23, input24, input25, input26, input27, input28, input29, input30, input31
 );
 
   // Create a 2D of wires
   wire[31:0] mux[31:0];
 
   // Connect the sources of the array
-  assign mux[0] = inputs[0];
-  assign mux[1] = inputs[1];
-  assign mux[2] = inputs[2];
-  assign mux[3] = inputs[3];
-  assign mux[4] = inputs[4];
-  assign mux[5] = inputs[5];
-  assign mux[6] = inputs[6];
-  assign mux[7] = inputs[7];
-  assign mux[8] = inputs[8];
-  assign mux[9] = inputs[9];
-  assign mux[10] = inputs[10];
-  assign mux[11] = inputs[11];
-  assign mux[12] = inputs[12];
-  assign mux[13] = inputs[13];
-  assign mux[14] = inputs[14];
-  assign mux[15] = inputs[15];
-  assign mux[16] = inputs[16];
-  assign mux[17] = inputs[17];
-  assign mux[18] = inputs[18];
-  assign mux[19] = inputs[19];
-  assign mux[20] = inputs[20];
-  assign mux[21] = inputs[21];
-  assign mux[22] = inputs[22];
-  assign mux[23] = inputs[23];
-  assign mux[24] = inputs[24];
-  assign mux[25] = inputs[25];
-  assign mux[26] = inputs[26];
-  assign mux[27] = inputs[27];
-  assign mux[28] = inputs[28];
-  assign mux[29] = inputs[29];
-  assign mux[30] = inputs[30];
-  assign mux[31] = inputs[31];
+  assign mux[0] = input0;
+  assign mux[1] = input1;
+  assign mux[2] = input2;
+  assign mux[3] = input3;
+  assign mux[4] = input4;
+  assign mux[5] = input5;
+  assign mux[6] = input6;
+  assign mux[7] = input7;
+  assign mux[8] = input8;
+  assign mux[9] = input9;
+  assign mux[10] = input10;
+  assign mux[11] = input11;
+  assign mux[12] = input12;
+  assign mux[13] = input13;
+  assign mux[14] = input14;
+  assign mux[15] = input15;
+  assign mux[16] = input16;
+  assign mux[17] = input17;
+  assign mux[18] = input18;
+  assign mux[19] = input19;
+  assign mux[20] = input20;
+  assign mux[21] = input21;
+  assign mux[22] = input22;
+  assign mux[23] = input23;
+  assign mux[24] = input24;
+  assign mux[25] = input25;
+  assign mux[26] = input26;
+  assign mux[27] = input27;
+  assign mux[28] = input28;
+  assign mux[29] = input29;
+  assign mux[30] = input30;
+  assign mux[31] = input31;
 
   // Connect the output of the array
   assign out = mux[address];
