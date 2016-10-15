@@ -7,7 +7,7 @@ module decoder1to32
   input		     enable,
   input[4:0]	 address
 );
-  assign out <= enable << address;
+  assign out = enable << address;
 endmodule
 
 // Deliverable 6 Explanation:
