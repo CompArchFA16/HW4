@@ -2,6 +2,7 @@
 // Test harness validates hw4testbench by connecting it to various functional 
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
+`include "regfile.v"
 
 module hw4testbenchharness();
 
@@ -138,6 +139,96 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3: Enable
+  //   if enable is false, then the register should not be written to
+  WriteRegister = 5'd2;
+  WriteData = 32'd42;
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4: decoder broken
+  //   Decoder is broken – All registers are written to.
+  //   For a constant decoder value, only one register should have a
+  //   non-zero value. Using read register, we can compare the outputs
+  //   from the register that is supposed to have a value,
+  //   and compare that to any other register. The two values should be different.
+  //   If the decoder value is 2, then the 2nd register should be written to
+  //   --> the value of the 1st and 2nd register should be different
+  //   --> if ReadRegister1 = 1 and ReadRegister2 = 2, then
+  //       ReadData1 should not equal readdata2
+  WriteRegister = 5'd2;
+  WriteData = 32'd42;
+  RegWrite = 1;
+  ReadRegister1 = 5'd1;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if(ReadData1 == ReadData2) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 4 Failed");
+  end
+
+
+  // Test Case 5: register zero
+  //   Register Zero is actually a register instead of the constant value zero.
+  //   In this case, if you select the zero register (using write register=0)
+  //   then the output for the 0th register (selected with read registers
+  //   should be zero
+  WriteRegister = 5'd0;
+  WriteData = 32'd42;
+  RegWrite = 0;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 5 Failed");
+  end
+
+  // they should also both be zero if the decoder picks a different register,
+  // but the ReadRegisters both look only at the 0th register.
+  WriteRegister = 5'd1;
+  WriteData = 32'd42;
+  RegWrite = 0;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 5 Failed");
+  end
+
+  // Test Case 6: port 2 broken
+  //   Port 2 is broken and always reads register 17.
+  //   This is saying that is ReadData2 only reads tha value from reg17,
+  //   then it is broken
+  WriteRegister = 5'd17;
+  WriteData = 32'd42;
+  RegWrite = 1;
+  ReadRegister1 = 5'd17;
+  ReadRegister2 = 5'd16;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  // Here we compare the result of readdata2 to the value of 
+  // the 17th register, and that value is stored in readregister1
+  if(ReadData1 == ReadData2) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 6 Failed");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5
