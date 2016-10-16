@@ -10,7 +10,7 @@ module register32
 
   genvar i;
   generate
-    for (i = 0; i < 31; i = i + 1)
+    for (i = 0; i < 32; i = i + 1)
     begin:ALUBitslice32
       register generatedRegister(
         outputData[i],

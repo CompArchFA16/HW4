@@ -11,8 +11,7 @@
 //   1 synchronous, positive edge triggered write port
 //------------------------------------------------------------------------------
 
-module regfile
-(
+module regfile (
   output [31:0] ReadData1,	   // Contents of first register read
   output [31:0] ReadData2,	   // Contents of second register read
   input  [31:0]	WriteData,	   // Contents to write to register
@@ -26,13 +25,12 @@ module regfile
   wire [31:0] registerEnable;
   decoder1to32 decoder1to32(registerEnable, RegWrite, WriteRegister);
 
-  wire [31:0] [0:31] regOuts;
+  wire [31:0] [31:0] regOuts;
   register32zero connectZero(regOuts[0], WriteData, registerEnable[0], Clk);
 
   genvar i;
   generate
-    for (i = 1; i < 31; i = i + 1)
-    begin:register32Connects
+    for (i = 1; i < 32; i = i + 1) begin:register32Connects
       register32 connectRegister(regOuts[i], WriteData, registerEnable[i], Clk);
     end
   endgenerate
