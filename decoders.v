@@ -7,7 +7,7 @@ output[31:0]	out,
 input		enable,
 input[4:0]	address
 );
-
+	// zero padding to right of enable to show which registers will be written to.
     assign out = enable<<address; 
 
 endmodule

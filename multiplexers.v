@@ -7,7 +7,7 @@ output      out,
 input[4:0]  address,
 input[31:0] inputs
 );
-  // Your code
+  // Your code, simple behavioral verilog for mux
   assign out = inputs[address];
 
 endmodule
@@ -25,7 +25,7 @@ input[31:0]		  input30, input31
 
 
   wire[31:0] mux[31:0];         // Create a 2D array of wires
-  // Connect the sources of the array
+  // Connect the sources of the array for each
   assign mux[0] = input0;       
   assign mux[1] = input1;
   assign mux[2] = input2;

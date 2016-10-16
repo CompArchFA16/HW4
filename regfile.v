@@ -28,16 +28,16 @@ input		Clk		// Clock (Positive Edge Triggered)
 	wire [31:0] decoder_output;
 	decoder1to32 decoder1(decoder_output, RegWrite, WriteRegister);
 
-	// 32 Registers (including 1 zero one)
+	// Make input wire for each of 32 Registers (including 1 zero one)
 	wire[31:0]  input0, input1, input2, input3, input4, input5, input6, input7, input8, input9;
 	wire[31:0]	input10, input11, input12, input13, input14, input15, input16, input17, input18, input19;
 	wire[31:0]	input20, input21, input22, input23, input24, input25, input26, input27, input28, input29;
 	wire[31:0]	input30, input31;
 
-	//Zero register (0th one)
+	//Zero register (0th one), input to register the input if write is enabled
 	register32zero register_zero_1(input0, WriteData, decoder_output[0], Clk);
 
-	// Other Registers
+	// Other Registers, input to register the input if write is enabled
 	register32 reg32_1(input1, WriteData, decoder_output[1], Clk);
 	register32 reg32_2(input2, WriteData, decoder_output[2], Clk);
 	register32 reg32_3(input3, WriteData, decoder_output[3], Clk);
@@ -70,7 +70,7 @@ input		Clk		// Clock (Positive Edge Triggered)
 	register32 reg32_30(input30, WriteData, decoder_output[30], Clk);
 	register32 reg32_31(input31, WriteData, decoder_output[31], Clk);
 
-	// Multiplexors x2
+	// Multiplexors x2, to pick where to read the data from
 	mux32to1by32	mux1(ReadData1, ReadRegister1, input0, input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20, input21, input22, input23, input24, input25, input26, input27, input28, input29, input30, input31);
 	mux32to1by32	mux2(ReadData2, ReadRegister2, input0, input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20, input21, input22, input23, input24, input25, input26, input27, input28, input29, input30, input31);
 
