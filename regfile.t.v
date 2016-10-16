@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Test harness validates hw4testbench by connecting it to various functional 
+// Test harness validates hw4testbench by connecting it to various functional
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
 
@@ -34,15 +34,15 @@ module hw4testbenchharness();
   hw4testbench tester
   (
     .begintest(begintest),
-    .endtest(endtest), 
+    .endtest(endtest),
     .dutpassed(dutpassed),
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
-    .WriteData(WriteData), 
-    .ReadRegister1(ReadRegister1), 
+    .WriteData(WriteData),
+    .ReadRegister1(ReadRegister1),
     .ReadRegister2(ReadRegister2),
     .WriteRegister(WriteRegister),
-    .RegWrite(RegWrite), 
+    .RegWrite(RegWrite),
     .Clk(Clk)
   );
 
@@ -107,9 +107,8 @@ output reg		Clk
     dutpassed = 1;
     #10
 
-  // Test Case 1: 
+  // Test Case 1:
   //   Write '42' to register 2, verify with Read Ports 1 and 2
-  //   (Passes because example register file is hardwired to return 42)
   WriteRegister = 5'd2;
   WriteData = 32'd42;
   RegWrite = 1;
@@ -123,9 +122,8 @@ output reg		Clk
     $display("Test Case 1 Failed");
   end
 
-  // Test Case 2: 
+  // Test Case 2:
   //   Write '15' to register 2, verify with Read Ports 1 and 2
-  //   (Fails with example register file, but should pass with yours)
   WriteRegister = 5'd2;
   WriteData = 32'd15;
   RegWrite = 1;
@@ -137,6 +135,105 @@ output reg		Clk
     dutpassed = 0;
     $display("Test Case 2 Failed");
   end
+
+  // Test Case 3:
+  //   Do not write to register 12, if RegWrite is OFF
+  WriteRegister = 5'd12;
+  WriteData = 32'd8151;
+  RegWrite = 0;
+  ReadRegister1 = 5'd12;
+  ReadRegister2 = 5'd12;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 8151) || (ReadData2 == 8151)) begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4:
+  //   Write '6152' to register 17, other registers should not change
+  //   Verify by reading registers 5 and 31 (not 17)
+  WriteRegister = 5'd17;
+  WriteData = 32'd6152;
+  RegWrite = 1;
+  ReadRegister1 = 5'd5;
+  ReadRegister2 = 5'd31;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 6152) || (ReadData2 == 6152)) begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5:
+  //   Register 0 should always return zero, regardless of inputs
+  WriteRegister = 5'd0;
+  WriteData = 32'd54321;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;
+    $display("Test Case 5 Failed");
+  end
+
+  // Test Case 6:
+  // Write 171717 to register 17 and 222222 to register 2
+  // Read register 17 != read register 2
+  WriteRegister = 5'd17;
+  WriteData = 32'd171717;
+  RegWrite = 1;
+  #5 Clk=1; #5 Clk=0;
+
+  WriteRegister = 5'd2;
+  WriteData = 32'd222222;
+  RegWrite = 1;
+  ReadRegister1 = 5'd17;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+
+  if(ReadData1 == ReadData2) begin
+    dutpassed = 0;
+    $display("Test Case 6 Failed");
+  end
+
+  // Test Case 7:
+  //   Write all ones to register 13, verify w/ read ports
+  WriteRegister = 5'd13;
+  WriteData = 32'hffffffff; // Hex
+  RegWrite = 1;
+  ReadRegister1 = 5'd13;
+  ReadRegister2 = 5'd13;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 32'hffffffff) || (ReadData2 != 32'hffffffff)) begin
+    dutpassed = 0;
+    $display("Test Case 7 Failed");
+  end
+
+  // Test Case 8:
+  //   Read previously saved value in register 25 after several clock cycles
+  WriteRegister = 5'd25;
+  WriteData = 32'd40961;
+  RegWrite = 1;
+  ReadRegister1 = 5'd25;
+  ReadRegister2 = 5'd25;
+  #5 Clk=1; #5 Clk=0; // First clock cycle
+
+  RegWrite = 0;
+  #5 Clk=1; #5 Clk=0; // 5 more clock cycles
+  #5 Clk=1; #5 Clk=0;
+  #5 Clk=1; #5 Clk=0;
+  #5 Clk=1; #5 Clk=0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 32'd40961) || (ReadData2 != 32'd40961)) begin
+    dutpassed = 0;
+    $display("Test Case 8 Failed");
+  end
+
 
 
   // All done!  Wait a moment and signal test completion.
