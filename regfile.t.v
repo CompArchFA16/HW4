@@ -20,7 +20,7 @@ module hw4testbenchharness();
   wire		    dutpassed;	    // Indicates whether register file passed tests
 
   // Instantiate the register file being tested.  DUT = Device Under Test
-  regfileport2 DUT
+  regfile DUT
   (
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
@@ -117,7 +117,7 @@ output reg		    Clk
   ReadRegister1 = 5'd2;
   ReadRegister2 = 5'd2;
   #5 Clk=1; #5 Clk=0;	// Generate single clock pulse
-
+  
   // Verify expectations and report test result
   if((ReadData1 != 42) || (ReadData2 != 42)) begin
     dutpassed = 0;	// Set to 'false' on failure
@@ -140,15 +140,15 @@ output reg		    Clk
 
   // Test Case 3: 
   //   Write Enable is broken / ignored – Register is always written to
-  //   Write '15' to register 2, RegWrite is '0', verify with Read Ports 1 and 2
+  //   Write '16' to register 2, RegWrite is '0', verify with Read Ports 1 and 2
   WriteRegister = 5'd2;
-  WriteData = 32'd15;
+  WriteData = 32'd16;
   RegWrite = 0;
   ReadRegister1 = 5'd2;
   ReadRegister2 = 5'd2;
   #5 Clk=1; #5 Clk=0;
 
-  if((ReadData1 != 15) || (ReadData2 != 15)) begin
+  if((ReadData1 == 16) || (ReadData2 == 16)) begin
     dutpassed = 0;
     $display("Test Case 3 Failed");
   end
@@ -192,7 +192,6 @@ output reg		    Clk
   ReadRegister1 = 5'd2;
   ReadRegister2 = 5'd4;
   #5 Clk=1; #5 Clk=0;
-  $display("Test Case 6 Passed %d %d", ReadData1, ReadData2);
   if(ReadData1 != 6) begin
     dutpassed = 0;
     $display("Test Case 6 Failed");
