@@ -1,3 +1,7 @@
+`include "regfile.v"
+
+`define TICK #5 Clk=1; #5 Clk=0;	// Generate single clock pulse
+
 //------------------------------------------------------------------------------
 // Test harness validates hw4testbench by connecting it to various functional 
 // or broken register files, and verifying that it correctly identifies each
@@ -91,6 +95,8 @@ output reg		RegWrite,
 output reg		Clk
 );
 
+reg [32:0] it; // iterator
+
   // Initialize register driver signals
   initial begin
     WriteData=32'd0;
@@ -137,6 +143,43 @@ output reg		Clk
     dutpassed = 0;
     $display("Test Case 2 Failed");
   end
+
+  // Test Case 3 : 
+  // Fully Perfect Register File
+  //
+  //for(WriteRegister= 5'b0; WriteRegister <= ~5'b0; WriteRegister=WriteRegister+1) begin
+  //    WriteData = 32'd0; #5
+
+  //    for(WriteData= 32'd0; WriteData <= ~32'd0; WriteData=WriteData+1) begin
+
+  //    end
+  //end
+  
+  // Test Case 4 :
+  // Write Enable is Broken, always written to
+  //
+  WriteRegister = 5'd4;
+  WriteData = 32'd66;
+  RegWrite = 0;
+  ReadRegister1 = 5'd4; 
+  ReadRegister2 = 5'd4;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 32'd66) || (ReadData2 == 32'd66)) begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5 :
+  // Decoder is Broken
+
+  // Test Case 6 : 
+  // Register Zero is a Register
+
+  // Test Case 7 :
+  // Port 2 is broken and always reads Register 17
+
+
 
 
   // All done!  Wait a moment and signal test completion.
