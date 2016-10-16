@@ -1,3 +1,7 @@
+`include "decoders.v"
+`include "register.v"
+`include "multiplexers.v"
+
 //------------------------------------------------------------------------------
 // MIPS register file
 //   width: 32 bits
@@ -21,7 +25,7 @@ input		Clk		// Clock (Positive Edge Triggered)
   wire[31:0] RegEnable;
   decoder1to32 decoder(RegEnable, RegWrite, WriteRegister);
 
-  wire[31:0] RegOut;
+  wire[31:0] RegOut[31:0];
   register32zero reg0(RegOut[0], WriteData, RegEnable[0], Clk);
   register32 reg1(RegOut[1], WriteData, RegEnable[1], Clk);
   register32 reg2(RegOut[2], WriteData, RegEnable[2], Clk);
@@ -55,5 +59,17 @@ input		Clk		// Clock (Positive Edge Triggered)
   register32 reg30(RegOut[30], WriteData, RegEnable[30], Clk);
   register32 reg31(RegOut[31], WriteData, RegEnable[31], Clk);
 
-  mux32to1by32 mux1(ReadData1, ReadRegister1, RegOut);
-  mux32to1by32 mux1(ReadData2, ReadRegister2, RegOut);
+  mux32to1by32 mux1(ReadData1, ReadRegister1, RegOut[0], RegOut[1], RegOut[2], 
+  					RegOut[3], RegOut[4], RegOut[5], RegOut[6], RegOut[7], RegOut[8], 
+  					RegOut[9], RegOut[10], RegOut[11], RegOut[12], RegOut[13], RegOut[14], 
+  					RegOut[15], RegOut[16], RegOut[17], RegOut[18], RegOut[19], RegOut[20], 
+  					RegOut[21], RegOut[22], RegOut[23], RegOut[24], RegOut[25], RegOut[26], 
+  					RegOut[27], RegOut[28], RegOut[29], RegOut[30], RegOut[31]);
+  mux32to1by32 mux2(ReadData2, ReadRegister2, RegOut[0], RegOut[1], RegOut[2], 
+  					RegOut[3], RegOut[4], RegOut[5], RegOut[6], RegOut[7], RegOut[8], 
+  					RegOut[9], RegOut[10], RegOut[11], RegOut[12], RegOut[13], RegOut[14], 
+  					RegOut[15], RegOut[16], RegOut[17], RegOut[18], RegOut[19], RegOut[20], 
+  					RegOut[21], RegOut[22], RegOut[23], RegOut[24], RegOut[25], RegOut[26], 
+  					RegOut[27], RegOut[28], RegOut[29], RegOut[30], RegOut[31]);
+
+endmodule
