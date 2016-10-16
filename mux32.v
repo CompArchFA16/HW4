@@ -16,7 +16,10 @@ module mux32to1by32
 (
     output[31:0]	out,
     input[4:0]		address,
-    input[31:0]		input0, input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20, input21, input22, input23, input24, input25, input26, input27, input28, input29, input30, input31
+    input[31:0]		input0, input1, input2, input3, input4, input5, input6, input7, input8, input9,
+                    input10, input11, input12, input13, input14, input15, input16, input17, input18,
+                    input19, input20, input21, input22, input23, input24, input25, input26, input27,
+                    input28, input29, input30, input31
 );
     wire[31:0] mux[31:0];       // Create a 2D array of wires
 
@@ -50,7 +53,7 @@ module mux32to1by32
     assign mux[26] = input26;
     assign mux[27] = input27;
     assign mux[28] = input28;
-    assign mux[39] = input29;
+    assign mux[29] = input29;
     assign mux[30] = input30;
     assign mux[31] = input31;
     

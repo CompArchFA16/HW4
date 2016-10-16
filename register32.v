@@ -13,6 +13,7 @@ module register32
     wire [31:0] d;
     wire wrenable, clk;
 
+    // 32 single-bit registers
     genvar i;
     generate
         for (i=0; i < 32; i=i+1) begin : createRegBits
@@ -32,6 +33,7 @@ module register32zero
     wire [31:0] d;
     wire wrenable, clk;
 
+    // always output 0
     assign q = 32'd0;
 
 endmodule
