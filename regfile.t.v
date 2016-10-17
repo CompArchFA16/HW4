@@ -190,6 +190,25 @@ output reg		Clk
 
     // PORT 2 ==================================================================
 
+    // Test Case 6:
+    //   Port 2 is broken and always reads register 17
+    WriteRegister = 5'd17;
+    WriteData = 32'd14;
+    RegWrite = 1'b1;
+    #5 Clk=1; #5 Clk=0;
+
+    WriteRegister = 5'd5;
+    WriteData = 32'd3;
+    RegWrite = 1'b1;
+    ReadRegister1 = 5'd17;
+    ReadRegister2 = 5'd5;
+    #5 Clk=1; #5 Clk=0;
+
+    if((ReadData1 === 32'd14) && (ReadData2 === 32'd14)) begin
+      dutpassed = 0;
+      $display("Test Case 6 Failed - ReadData2 should actually be 3");
+    end
+
     // All done!  Wait a moment and signal test completion.
     #5
     endtest = 1;

@@ -49,5 +49,10 @@ module regfile (
   endgenerate
 
   mux32to1by32 chooseReadData1(ReadData1, ReadRegister1, regOuts);
+
+  // <<<<<<<< TEST: Toggle to have a broken port 2
   mux32to1by32 chooseReadData2(ReadData2, ReadRegister2, regOuts);
+  // ========
+  // mux32to1by32 chooseReadData2(ReadData2, 5'd17, regOuts);
+  // >>>>>>>>
 endmodule
