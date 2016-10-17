@@ -22,11 +22,24 @@ module regfile (
   input		      Clk		         // Clock (Positive Edge Triggered)
 );
 
+  // <<<<<<<< TEST: Toggle this to have a write enable
+  // assign RegWrite = 1'b1;
+  // >>>>>>>>
+
+  // <<<<<<<< TEST: Toggle this to have a broken decoder
   wire [31:0] registerEnable;
   decoder1to32 decoder1to32(registerEnable, RegWrite, WriteRegister);
+  // ========
+  // wire [31:0] registerEnable;
+  // assign registerEnable = 32'hFFFFFFFF;
+  // >>>>>>>>
 
   wire [31:0] [31:0] regOuts;
+  // <<<<<<<< TEST: Toggle this to have a regular register
   register32zero connectZero(regOuts[0], WriteData, registerEnable[0], Clk);
+  // ========
+  // register32 connectZero(regOuts[0], WriteData, registerEnable[0], Clk);
+  // >>>>>>>>
 
   genvar i;
   generate

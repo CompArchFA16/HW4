@@ -141,6 +141,44 @@ output reg		Clk
       $display("Test Case 2 Failed");
     end
 
+    // WRITE ENABLE ============================================================
+
+    // Test Case 3:
+    //   Do not enable write of '17' to register 2, verify with Read Ports 1 and 2
+    WriteRegister = 5'd2;
+    WriteData = 32'd17;
+    RegWrite = 1'bz;
+    ReadRegister1 = 5'd2;
+    ReadRegister2 = 5'd3;
+    #5 Clk=1; #5 Clk=0;
+
+    if(ReadData1 == 17) begin
+      dutpassed = 0;
+      $display("Test Case 3 Failed - Write enable is set to Z");
+    end
+
+    // DECODER =================================================================
+
+    // Test Case 4:
+    //   The decoder is broken. All registers are written to
+    WriteRegister = 5'd2;
+    WriteData = 32'd18;
+    RegWrite = 1'b1;
+    ReadRegister1 = 5'd5;
+    ReadRegister2 = 5'd7;
+    #5 Clk=1; #5 Clk=0;
+
+    $display("%d", ReadData1);
+    $display("%d", ReadData2);
+    if((ReadData1 == 18) || (ReadData2 == 18)) begin
+      dutpassed = 0;
+      $display("Test Case 4 Failed - Decoder not writing correctly");
+    end
+
+    // ZERO REGISTER ===========================================================
+
+    // PORT 2 ==================================================================
+
     // All done!  Wait a moment and signal test completion.
     #5
     endtest = 1;
