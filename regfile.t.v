@@ -148,43 +148,9 @@ reg [31:0] dummy2 [31:0]; // another dummy
     $display("Test Case 2 Failed");
   end
 
-  // Phase 1 - random testing x 100
-  //for(it=0;it < 32'd1000; it=it+1) begin
-  //    WriteRegister = {$random} % (1 << 5);
-  //    WriteData = {$random};
-  //    RegWrite = {$random} % 2;
-  //    ReadRegister1 = {$random} % (1 << 5);
-  //    ReadRegister2 = WriteRegister;
+  // Test Case 8-1 (all perfect) will be addressed last
+  // because it encompasses other error cases as well.
 
-  //    if (RegWrite) begin
-
-  //  	  if(WriteRegister == 0) begin
-
-  //  	  end
-
-  //    end
-  //    `TICK;
-
-  //    if ((ReadRegister1 == 0 && ReadData1 != 0) ||
-  //  	  (ReadRegister2 == 0 && ReadData2 != 0)) begin
-  //  	  $display("Register Zero Broken!");
-  //    end
-
-  //    if (RegWrite && (WriteData != ReadData2)) begin
-  //  	  $display("Write Broken!");
-  //    end
-
-  //    if (!RegW
-  //end
-  //
-  //for(WriteRegister= 5'b0; WriteRegister <= ~5'b0; WriteRegister=WriteRegister+1) begin
-  //    WriteData = 32'd0; #5
-
-  //    for(WriteData= 32'd0; WriteData <= ~32'd0; WriteData=WriteData+1) begin
-
-  //    end
-  //end
-  
   // Test Case 8-2 :
   // Write Enable is Broken, always written to
   // 

@@ -28,7 +28,6 @@ wire[31:0] r_adr2;
 wire[31:0] w_adr; //decoded address
 
 decoder1to32 dc_w(w_adr,RegWrite,WriteRegister);
-
 register32zero #(.n(32)) register0(mem[0], WriteData, w_adr[0], Clk);
 
 generate
