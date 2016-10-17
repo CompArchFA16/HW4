@@ -22,7 +22,7 @@ module regfile (
   input		      Clk		         // Clock (Positive Edge Triggered)
 );
 
-  // <<<<<<<< TEST: Toggle this to have a write enable
+  // <<<<<<<< TEST: Uncomment this to have a broken write enable
   // assign RegWrite = 1'b1;
   // >>>>>>>>
 

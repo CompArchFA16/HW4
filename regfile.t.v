@@ -168,14 +168,25 @@ output reg		Clk
     ReadRegister2 = 5'd7;
     #5 Clk=1; #5 Clk=0;
 
-    $display("%d", ReadData1);
-    $display("%d", ReadData2);
     if((ReadData1 == 18) || (ReadData2 == 18)) begin
       dutpassed = 0;
       $display("Test Case 4 Failed - Decoder not writing correctly");
     end
 
     // ZERO REGISTER ===========================================================
+
+    // Test Case 5:
+    //   Register0 is actually a register instead of the constant value 0
+    WriteRegister = 5'd0;
+    WriteData = 32'd21;
+    RegWrite = 1'b1;
+    ReadRegister1 = 5'd0;
+    #5 Clk=1; #5 Clk=0;
+
+    if(ReadData1 !== 32'b0) begin
+      dutpassed = 0;
+      $display("Test Case 5 Failed - Register 0 is not outputing 0");
+    end
 
     // PORT 2 ==================================================================
 
