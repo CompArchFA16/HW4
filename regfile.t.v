@@ -140,7 +140,68 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3:
+  //   Do not write '16' to register 3 b/c RegWrite is 0
+  WriteRegister = 5'd3;
+  WriteData = 32'd16;
+  RegWrite = 0;
+  ReadRegister1 = 5'd3;
+  ReadRegister2 = 5'd3;
+  #5 Clk=1; #5 Clk=0;
 
+  if((ReadData1 == 16) || (ReadData2 == 16)) begin
+     dutpassed = 0;
+     $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4:
+  //   Write '267' to register 4, no other registers should change
+  WriteRegister = 5'd4;
+  WriteData = 32'd267;
+  RegWrite = 1;
+  ReadRegister1 = 5'd8;
+  ReadRegister2 = 5'd31;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 267) || (ReadData2 == 267)) begin
+     dutpassed = 0;
+     $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5:
+  //   Write '724' to register 0, should still return 0
+  WriteRegister = 5'd0;
+  WriteData = 32'd724;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 724) || (ReadData2 == 724)) begin
+     dutpassed = 0;
+     $display("Test Case 5 Failed");
+  end
+     
+  // Test Case 6:
+  //   Write '777' to register 17 and '222' to register 2
+  //   Register 17 should not be the same as register 2
+     WriteRegister = 5'd17;
+     WriteData = 32'd777;
+     RegWrite = 1;
+     #5 Clk=1; #5 Clk=0;
+
+     WriteRegister = 5'd2;
+     WriteData = 32'd222;
+     RegWrite = 1;
+     ReadRegister1 = 5'd17;
+     ReadRegister2 = 5'd2;
+     #5 Clk=1; #5 Clk=0;
+
+     if(ReadData1 == ReadData2) begin
+	dutpassed = 0;
+	$display("Test Case 6 Failed");
+     end
+  
   // All done!  Wait a moment and signal test completion.
   #5
   endtest = 1;
