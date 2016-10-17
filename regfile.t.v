@@ -1,3 +1,4 @@
+`include "regfile.v"
 //------------------------------------------------------------------------------
 // Test harness validates hw4testbench by connecting it to various functional 
 // or broken register files, and verifying that it correctly identifies each
@@ -138,6 +139,87 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3:
+  //    WriteEnable is broken / ignored
+  WriteRegister = 5'd2;
+  WriteData = 32'd12;
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 12) || (ReadData2 == 12)) begin
+      dutpassed = 0;
+      $display("Test Case 3 Failed");
+  end
+
+  WriteRegister = 5'd2;
+  WriteData = 32'd12;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 12) || (ReadData2 != 12)) begin
+      dutpassed = 0;
+      $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4:
+  //    Decoder is broken -- All registers written
+  WriteRegister = 5'd2;
+  WriteData = 32'd12;
+  RegWrite = 1;
+
+
+  ReadRegister1 = 5'd3;
+  #5 Clk=1; #5 Clk=0;
+  if (ReadData1 == 12) begin
+      dutpassed = 0;
+      $display("Test Case 4 Failed");
+  end
+
+  ReadRegister1 = 5'd4;
+  #5 Clk=1; #5 Clk=0;
+  if (ReadData1 == 12) begin
+      dutpassed = 0;
+      $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5:
+  //    Register Zero is an actual register
+  WriteRegister = 5'd0;
+  WriteData = 32'd12;
+  RegWrite = 1;
+
+
+  ReadRegister1 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+  if (ReadData1 != 0) begin
+      dutpassed = 0;
+      $display("Test Case 5 Failed");
+  end
+
+  // Test Case 6:
+  //    Port 2 is broken and always reads register 17
+  WriteRegister = 5'd2;
+  WriteData = 32'd2;
+  RegWrite = 1;
+  #5 Clk=1; #5 Clk=0;
+
+  WriteRegister = 5'd17;
+  WriteData = 32'd47;
+  RegWrite = 1;
+
+
+  ReadRegister1 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+  if (ReadData1 == 47) begin
+      dutpassed = 0;
+      $display("Test Case 6 Failed");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5

@@ -36,3 +36,7 @@ wrenable--|__/
 
 ```    
 
+Deliverable 6:
+===
+
+The decoder functions by bit shifting the value of `enable` by `address` to the left. Thus, if `enable=1`, then the `out[address]` will be equal to one. This results in a decoder because the input is an address, as well as an enable bit, and the output is a high where the address specifies in the `out` bus.

@@ -1,3 +1,7 @@
+`include "decoders.v"
+`include "mux.v"
+`include "register.v"
+
 //------------------------------------------------------------------------------
 // MIPS register file
 //   width: 32 bits
@@ -18,10 +22,26 @@ input        RegWrite,    // Enable writing of register when High
 input        Clk        // Clock (Positive Edge Triggered)
 );
 
-  // These two lines are clearly wrong.  They are included to showcase how the 
-  // test harness works. Delete them after you understand the testing process, 
-  // and replace them with your actual code.
-  assign ReadData1 = 42;
-  assign ReadData2 = 42;
+    // These two lines are clearly wrong.  They are included to showcase how the 
+    // test harness works. Delete them after you understand the testing process, 
+    // and replace them with your actual code.
+    //assign ReadData1 = 42;
+    //assign ReadData2 = 42;
+
+    wire[31:0] write;
+    wire[32*32-1:0] registerFile;
+
+    decoder1to32 decoder0(write, RegWrite, WriteRegister);
+
+    register32zero register(registerFile[31:0], WriteData, write[0], Clk);
+    genvar i;
+    generate 
+    for (i=1; i < 32; i=i+1) begin: registers
+        register32 register(registerFile[32*(i+1)-1:32*i], WriteData, write[i], Clk);
+    end
+    endgenerate
+    
+    mux32to1by32 mux0(ReadData1, ReadRegister1, registerFile);
+    mux32to1by32 mux1(ReadData2, ReadRegister2, registerFile);
 
 endmodule
