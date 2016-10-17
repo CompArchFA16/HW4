@@ -4,7 +4,7 @@
 ![Deliverable 1](images/deliverable1.jpg)
 
 
-## Deliverable 2
+## Deliverable 6
 
 Decoders typically take an n-digit binary number and decode that number into 2^n outputs.
 
