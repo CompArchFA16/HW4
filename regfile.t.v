@@ -140,6 +140,67 @@ output reg    Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3:
+  // Write Enable is broken / ignored – Register is always written to.
+  WriteRegister = 5'd3;
+  WriteData = 32'd20;
+  RegWrite = 0;
+  ReadRegister1 = 5'd3;
+  ReadRegister2 = 5'd3;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 20) || (ReadData2 == 20)) begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed: write enable broken");
+  end
+
+  // Test Case 4:
+  // Decoder is broken – All registers are written to.
+  WriteRegister = 5'd4;
+  WriteData = 32'd25;
+  RegWrite = 1;
+  ReadRegister1 = 5'd10;
+  ReadRegister2 = 5'd11;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 25) || (ReadData2 == 25)) begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed: broken decoder, all registers written to");
+  end
+
+
+  // Test Case 5:
+  // Register Zero is actually a register instead of the constant value zero.
+  WriteRegister = 5'd0;
+  WriteData = 32'd30;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;
+    $display("Test Case 5 Failed: Register Zero is a register instead of the constant value zero");
+  end
+
+  // Test Case 6:
+  // Port 2 is broken and always reads register 17.
+  WriteRegister = 5'd30;
+  WriteData = 32'd11;
+  RegWrite = 1;
+  ReadRegister1 = 5'd30;
+  ReadRegister2 = 5'd30;
+  #5 Clk=1; #5 Clk=0;
+
+  WriteRegister = 5'd17;
+  WriteData = 32'd17;
+  RegWrite = 1;
+  #5 Clk=1; #5 Clk=0;
+
+  if(ReadData2 == 17) begin
+    dutpassed = 0;
+    $display("Test Case 6 Failed: Port 2 always reads register 17");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5

@@ -71,5 +71,4 @@ input		Clk		// Clock (Positive Edge Triggered)
   					RegOut[15], RegOut[16], RegOut[17], RegOut[18], RegOut[19], RegOut[20], 
   					RegOut[21], RegOut[22], RegOut[23], RegOut[24], RegOut[25], RegOut[26], 
   					RegOut[27], RegOut[28], RegOut[29], RegOut[30], RegOut[31]);
-
 endmodule
