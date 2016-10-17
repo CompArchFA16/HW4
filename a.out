@@ -1,0 +1,50 @@
+#! /usr/bin/vvp
+:ivl_version "0.9.7 " "(v0_9_7)";
+:vpi_time_precision + 0;
+:vpi_module "system";
+:vpi_module "v2005_math";
+:vpi_module "va_math";
+S_0x1e6cc10 .scope module, "register" "register" 2 4;
+ .timescale 0 0;
+v0x1e36080_0 .net "clk", 0 0, C4<z>; 0 drivers
+v0x1e7be50_0 .net "d", 0 0, C4<z>; 0 drivers
+v0x1e7bef0_0 .var "q", 0 0;
+v0x1e7bf90_0 .net "wrenable", 0 0, C4<z>; 0 drivers
+E_0x1e6e860 .event posedge, v0x1e36080_0;
+S_0x1e6cd00 .scope module, "register32" "register32" 2 20;
+ .timescale 0 0;
+L_0x1e7c6b0 .functor AND 1, C4<z>, C4<z>, C4<1>, C4<1>;
+v0x1e7c0b0_0 .net *"_s1", 0 0, L_0x1e7c6b0; 1 drivers
+v0x1e7c170_0 .net "clk", 0 0, C4<z>; 0 drivers
+v0x1e7c210_0 .net "d", 31 0, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; 0 drivers
+v0x1e7c2b0_0 .var "q", 31 0;
+v0x1e7c360_0 .net "wrenable", 0 0, C4<z>; 0 drivers
+E_0x1e7c040 .event posedge, L_0x1e7c6b0;
+S_0x1e6dcf0 .scope module, "register32zero" "register32zero" 2 34;
+ .timescale 0 0;
+v0x1e7c400_0 .net "clk", 0 0, C4<z>; 0 drivers
+v0x1e7c4c0_0 .net "d", 31 0, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; 0 drivers
+v0x1e7c560_0 .net "q", 31 0, C4<00000000000000000000000000000000>; 1 drivers
+v0x1e7c600_0 .net "wrenable", 0 0, C4<z>; 0 drivers
+    .scope S_0x1e6cc10;
+T_0 ;
+    %wait E_0x1e6e860;
+    %load/v 8, v0x1e7bf90_0, 1;
+    %jmp/0xz  T_0.0, 8;
+    %load/v 8, v0x1e7be50_0, 1;
+    %set/v v0x1e7bef0_0, 8, 1;
+T_0.0 ;
+    %jmp T_0;
+    .thread T_0;
+    .scope S_0x1e6cd00;
+T_1 ;
+    %wait E_0x1e7c040;
+    %load/v 8, v0x1e7c210_0, 32;
+    %set/v v0x1e7c2b0_0, 8, 32;
+    %jmp T_1;
+    .thread T_1;
+# The file index is used to find the file name in the following table.
+:file_names 3;
+    "N/A";
+    "<interactive>";
+    "register.v";
