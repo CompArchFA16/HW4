@@ -1,7 +1,10 @@
 //------------------------------------------------------------------------------
-// Test harness validates hw4testbench by connecting it to various functional 
+// Test harness validates hw4testbench by connecting it to various functional
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
+`include "decoders.v"
+`include "register.v"
+`include "regfile.v"
 
 module hw4testbenchharness();
 
@@ -34,15 +37,15 @@ module hw4testbenchharness();
   hw4testbench tester
   (
     .begintest(begintest),
-    .endtest(endtest), 
+    .endtest(endtest),
     .dutpassed(dutpassed),
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
-    .WriteData(WriteData), 
-    .ReadRegister1(ReadRegister1), 
+    .WriteData(WriteData),
+    .ReadRegister1(ReadRegister1),
     .ReadRegister2(ReadRegister2),
     .WriteRegister(WriteRegister),
-    .RegWrite(RegWrite), 
+    .RegWrite(RegWrite),
     .Clk(Clk)
   );
 
@@ -92,6 +95,7 @@ output reg		Clk
 );
 
   // Initialize register driver signals
+  reg write_broken, decoder_broken, register_not_zero, always_reads_reg_17;
   initial begin
     WriteData=32'd0;
     ReadRegister1=5'd0;
@@ -99,6 +103,11 @@ output reg		Clk
     WriteRegister=5'd0;
     RegWrite=0;
     Clk=0;
+
+    write_broken=0;
+    decoder_broken=0;
+    register_not_zero=0;
+    always_reads_reg_17=0;
   end
 
   // Once 'begintest' is asserted, start running test cases
@@ -107,7 +116,7 @@ output reg		Clk
     dutpassed = 1;
     #10
 
-  // Test Case 1: 
+  // Test Case 1:
   //   Write '42' to register 2, verify with Read Ports 1 and 2
   //   (Passes because example register file is hardwired to return 42)
   WriteRegister = 5'd2;
@@ -120,10 +129,10 @@ output reg		Clk
   // Verify expectations and report test result
   if((ReadData1 != 42) || (ReadData2 != 42)) begin
     dutpassed = 0;	// Set to 'false' on failure
-    $display("Test Case 1 Failed");
+    $display("Failed TC01: Read and write to register 2 failed");
   end
 
-  // Test Case 2: 
+  // Test Case 2:
   //   Write '15' to register 2, verify with Read Ports 1 and 2
   //   (Fails with example register file, but should pass with yours)
   WriteRegister = 5'd2;
@@ -135,9 +144,100 @@ output reg		Clk
 
   if((ReadData1 != 15) || (ReadData2 != 15)) begin
     dutpassed = 0;
-    $display("Test Case 2 Failed");
+    $display("Failed TC02: Could not write to register 2");
   end
 
+
+  // Test Case 3:
+  //   Write '15' to register 2, switch write enabled false,
+  //   write '30' to register 2, verify that '30' was NOT written.
+  //   DELIVERABLE 8 CASE 2: Tests if write enable is ignored.
+  WriteRegister = 5'd2;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+  RegWrite = 0;
+  WriteRegister = 5'd2;
+  WriteData = 32'd30;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 15) || (ReadData2 != 15)) begin
+    dutpassed = 0;
+    write_broken = 1;
+    $display("Failed TC03: Write is always enabled for register 2");
+  end
+
+  // Test Case 4:
+  //   Write '15' to register 16, write '15' to register 31,
+  //   write '31' to register 16,
+  //   verify that reg 16 was written to and reg 31 has not changed
+  //   DELIVERABLE 8 CASE 3: Decoder broken. Multiple registers written to.
+  RegWrite = 1;
+  ReadRegister1 = 5'd16;
+  ReadRegister2 = 5'd28;
+  WriteRegister = 5'd16; WriteData = 32'd15;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd31; WriteData = 32'd15;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd16; WriteData = 32'd31;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 31) || (ReadData2 != 15)) begin
+    dutpassed = 0;
+    decoder_broken = 1;
+    $display("Failed TC04: Decoder broken. Multiple registers written to");
+  end
+
+  // Test Case 5:
+  //   Attempt to write '15' to register 0
+  //   DELIVERABLE 8 CASE 4: Register 0 does not hold constant of zero.
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  WriteRegister = 5'd0; WriteData = 32'd15;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;
+    register_not_zero = 1;
+    $display("Failed TC05: Register 0 does not hold constant of zero");
+  end
+
+  // Test Case 6:
+  //
+  //   DELIVERABLE 8 CASE 5: Port 2 always reads register 17.
+  RegWrite = 1;
+  ReadRegister1 = 5'd5;
+  ReadRegister2 = 5'd5;
+  WriteRegister = 5'd5; WriteData = 32'd15;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd17; WriteData = 32'd31;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData2 == 31)) begin
+    dutpassed = 0;
+    always_reads_reg_17 = 1;
+    $display("Failed TC06: Port 2 always reads register 17");
+  end
+
+  // Report classifications
+  if(!(write_broken || decoder_broken || register_not_zero || always_reads_reg_17)) begin
+    $display("CLASS 1 REGISTER: A fully perfect register file");
+  end
+  if(write_broken) begin
+    $display("CLASS 2 REGISTER: Write Enable is broken / ignored – Register is always written to");
+  end
+  if(decoder_broken) begin
+    $display("CLASS 3 REGISTER: Decoder is broken – All registers are written to");
+  end
+  if(register_not_zero) begin
+    $display("CLASS 4 REGISTER: Register Zero is actually a register instead of the constant value zero");
+  end
+  if(always_reads_reg_17) begin
+    $display("CLASS 5 REGISTER: Port 2 is broken and always reads register 17");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5
