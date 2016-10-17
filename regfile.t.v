@@ -145,13 +145,16 @@ output reg		Clk
   //  If enable is false, all pins should be low
   // Write port 2 to 15 with enable set to 0 and check if value was assigned
   WriteRegister = 5'd2;
-  WriteData = 32'd15;
+  WriteData = 32'd30;
   RegWrite = 0;
   ReadRegister1 = 5'd2;
   ReadRegister2 = 5'd2;
   #5 Clk=1; #5 Clk=0;
 
-  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+  // Have to check if 15 here and not just for zero
+  // Otherwise will fail on previously set values
+  // Test value also needs to be different than value set on previous test
+  if((ReadData1 == 30) || (ReadData2 == 30)) begin
     dutpassed = 0;
     $display("Test Case 3 Failed");
   end
