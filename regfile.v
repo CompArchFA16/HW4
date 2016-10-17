@@ -32,10 +32,10 @@ decoder1to32 dc_w(w_adr,RegWrite,WriteRegister);
 register32zero #(.n(32)) register0(mem[0], WriteData, w_adr[0], Clk);
 
 generate
-  genvar i;
-  for (i=1; i<32; i = i+1) begin: reggenblk 
-	  register32 #(.n(32)) register(mem[i],WriteData,w_adr[i],Clk); //q,d,en,clk
-  end
+genvar i;
+for (i=1; i<32; i = i+1) begin: reggenblk 
+	register32 #(.n(32)) register(mem[i],WriteData,w_adr[i],Clk); //q,d,en,clk
+end
 endgenerate
 
 mux32to1by32 m_r1(ReadData1, ReadRegister1,
