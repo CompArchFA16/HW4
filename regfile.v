@@ -25,7 +25,7 @@ wire[31:0] register[31:0];
 
 decoder1to32 decodeEnable(wrenable, RegWrite, WriteRegister);
 
-register32zero regZero(register[0], WriteData, wrenable[0], Clk);
+register32zero regZero(register[0], WriteData, wrenable[0], Clk);	//set 0 register
 
 generate
 	genvar i;
