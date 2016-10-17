@@ -2,6 +2,8 @@
 // Test harness validates hw4testbench by connecting it to various functional 
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
+`include "regfile.v"
+
 
 module hw4testbenchharness();
 
@@ -123,9 +125,9 @@ output reg		Clk
     $display("Test Case 1 Failed");
   end
 
-  // Test Case 2: 
+  // Test Case 2: D8C1
   //   Write '15' to register 2, verify with Read Ports 1 and 2
-  //   (Fails with example register file, but should pass with yours)
+  //   (Fails with example register file, but should pass with yours) "Perfect"
   WriteRegister = 5'd2;
   WriteData = 32'd15;
   RegWrite = 1;
@@ -138,6 +140,93 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+//~~~~~~~~~~~~~My Test Cases
+  // Test Case 3: D8C2
+  // Write Enable Broken
+  // Always write
+  WriteRegister = 5'd2;
+  WriteData = 32'd42;
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 == 42) || (ReadData2 == 42)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 3 Failed");
+  end
+
+  WriteRegister = 5'd2;
+  WriteData = 32'd42;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 != 42) || (ReadData2 != 42)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4: D8C3
+  // Decoder Broken
+  // Write to Everything
+  WriteRegister = 5'd2;
+  WriteData = 32'd43;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd3;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 != 43)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 4 Failed");
+  end
+
+  if((ReadData2 == 43)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5: D8C4
+  // Register 0 is a real reg
+  // not always 0
+  WriteRegister = 5'd0;
+  WriteData = 32'd33;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 5 Failed");
+  end
+
+  // Test Case 6: D8C5
+  // Port 2 Broken
+  // Always read 17
+  WriteRegister = 5'd2;
+  WriteData = 32'd26;
+  RegWrite = 1;      
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd17;
+  WriteData = 32'd27;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0; // Generate single clock pulse
+
+  // Verify expectations and report test result
+  if((ReadData2 == 27)) begin
+    dutpassed = 0;  // Set to 'false' on failure
+    $display("Test Case 6 Failed");
+  end
+//~~~~~~~~~~~~~End My Tests
 
   // All done!  Wait a moment and signal test completion.
   #5

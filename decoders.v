@@ -3,12 +3,16 @@
 //   enable=1: out[address] is 1, all other outputs are 0
 module decoder1to32
 (
-output[31:0]	out,
+output[31:0]	out, 
 input		enable,
 input[4:0]	address
 );
 
-    assign out = enable<<address; 
+    assign out = enable<<address; // << is a left shift
 
 endmodule
 
+// enable << address shifts enable over to the address given by address
+// assign than sets out to that value, so that it will enable a that bit (if enable is on)
+// 0000 0000 0000 0000 0000 0000 0000 0010 = 1 << 0001
+// enables bit 1 (given by address)
