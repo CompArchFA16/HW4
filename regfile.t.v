@@ -129,7 +129,7 @@ output reg		Clk
   // Verify expectations and report test result
   if((ReadData1 != 42) || (ReadData2 != 42)) begin
     dutpassed = 0;	// Set to 'false' on failure
-    $display("Test Case 1 Failed");
+    $display("Failed TC01: Read and write to register 2 failed");
   end
 
   // Test Case 2:
@@ -220,6 +220,23 @@ output reg		Clk
     dutpassed = 0;
     always_reads_reg_17 = 1;
     $display("Failed TC06: Port 2 always reads register 17");
+  end
+
+  // Report classifications
+  if(!(write_broken || decoder_broken || register_not_zero || always_reads_reg_17)) begin
+    $display("CLASS 1 REGISTER: A fully perfect register file");
+  end
+  if(write_broken) begin
+    $display("CLASS 2 REGISTER: Write Enable is broken / ignored – Register is always written to");
+  end
+  if(decoder_broken) begin
+    $display("CLASS 3 REGISTER: Decoder is broken – All registers are written to");
+  end
+  if(register_not_zero) begin
+    $display("CLASS 4 REGISTER: Register Zero is actually a register instead of the constant value zero");
+  end
+  if(always_reads_reg_17) begin
+    $display("CLASS 5 REGISTER: Port 2 is broken and always reads register 17");
   end
 
   // All done!  Wait a moment and signal test completion.
