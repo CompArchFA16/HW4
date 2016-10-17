@@ -1,3 +1,5 @@
+`include "regfile.v"
+
 //------------------------------------------------------------------------------
 // Test harness validates hw4testbench by connecting it to various functional 
 // or broken register files, and verifying that it correctly identifies each
@@ -137,6 +139,71 @@ output reg		Clk
     dutpassed = 0;
     $display("Test Case 2 Failed");
   end
+
+  // Test Case 3:
+  //  Decoder enable is broken - all registers written to
+  //  If enable is false, all pins should be low
+  // Write port 2 to 15 with enable set to 0 and check if value was assigned
+  WriteRegister = 5'd2;
+  WriteData = 32'd30;
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+
+  // Have to check if 15 here and not just for zero
+  // Otherwise will fail on previously set values
+  // Test value also needs to be different than value set on previous test
+  if((ReadData1 == 30) || (ReadData2 == 30)) begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4:
+  //  Decoder is broken - all registers written to
+  //  Write port 2 to 15 and check if port 1 gets the value
+  WriteRegister = 5'd2;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd1;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 15) || (ReadData2 == 15)) begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5:
+  //  Register Zero is actually a register instead of the constant value zero
+  // Write port 0 to 15 and check if the value changed 
+  WriteRegister = 5'd0;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if (ReadData1 != 0) begin
+    dutpassed = 0;
+    $display("Test Case 5 Failed");
+  end
+
+  // Test Case 6:
+  //  Port 2 is broken and always reads register 17
+  // Set port 2 to 15 and 17 to 30 and check if 2 changed
+  WriteRegister = 5'd2;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd17;
+  WriteData  = 32'd30;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+
+  if(ReadData1 == 30) begin
+    dutpassed = 0;
+    $display("Test Case 6 Failed");
+  end 
 
 
   // All done!  Wait a moment and signal test completion.
