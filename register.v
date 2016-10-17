@@ -75,6 +75,7 @@ input[31:0]     input0, input1, input2, input3, input4, input5,
 
   wire[31:0] mux[31:0];         // Create a 2D array of wires
 
+  assign mux[0] = input0;
   assign mux[1] = input1;       // Connect the sources of the array
   assign mux[2] = input2;
   assign mux[3] = input3;
