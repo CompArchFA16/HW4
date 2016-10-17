@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
-// Test harness validates hw4testbench by connecting it to various functional 
+// Test harness validates hw4testbench by connecting it to various functional
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
-
+`include "regfile.v"
 module hw4testbenchharness();
 
   wire[31:0]	ReadData1;	// Data from first register read
@@ -34,15 +34,15 @@ module hw4testbenchharness();
   hw4testbench tester
   (
     .begintest(begintest),
-    .endtest(endtest), 
+    .endtest(endtest),
     .dutpassed(dutpassed),
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
-    .WriteData(WriteData), 
-    .ReadRegister1(ReadRegister1), 
+    .WriteData(WriteData),
+    .ReadRegister1(ReadRegister1),
     .ReadRegister2(ReadRegister2),
     .WriteRegister(WriteRegister),
-    .RegWrite(RegWrite), 
+    .RegWrite(RegWrite),
     .Clk(Clk)
   );
 
@@ -90,6 +90,9 @@ output reg[4:0]		WriteRegister,
 output reg		RegWrite,
 output reg		Clk
 );
+integer i; //iterate through all the registers
+integer j;
+//reg i;
 
   // Initialize register driver signals
   initial begin
@@ -107,7 +110,7 @@ output reg		Clk
     dutpassed = 1;
     #10
 
-  // Test Case 1: 
+  // Test Case 1:
   //   Write '42' to register 2, verify with Read Ports 1 and 2
   //   (Passes because example register file is hardwired to return 42)
   WriteRegister = 5'd2;
@@ -123,7 +126,7 @@ output reg		Clk
     $display("Test Case 1 Failed");
   end
 
-  // Test Case 2: 
+  // Test Case 2:
   //   Write '15' to register 2, verify with Read Ports 1 and 2
   //   (Fails with example register file, but should pass with yours)
   WriteRegister = 5'd2;
@@ -138,11 +141,98 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  //Test Case 3:
+  //Write Enable is broken / ignored – Register is always written to.
+  //Write '1' to register 2, RegWrite set to 0, verify with Read Ports 1 and 2
+  WriteRegister = 5'd2;
+  WriteData = 32'd16; //will write 16 instead of not writing if RegWrite is ignored
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+
+    if(ReadData1 != 15)
+  begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed (write enable broken)");
+  end
+
+  //Test Case 4
+  //Write '15' to register 2, verify with Read Ports 1 and 2
+  //Decoder is broken – All registers are written to
+  WriteRegister = 5'd2;
+  WriteData = 32'd13;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd1;
+  #5 Clk=1; #5 Clk=0;
+
+  //$display(ReadData1);
+  //$display(ReadData2);
+  if(ReadData1 != 13 || ReadData2 == 13) //checks that it was actually written to port 2 and not to port 1
+                                         //(if it writes to every register, checking one other port is sufficient to see the error)
+  begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed (decoder broken)");
+  end
+
+
+  //Test Case 5
+  //Register Zero is actually a register instead of the constant value zero.
+  WriteRegister = 5'd0;
+  WriteData = 32'd1;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if ((ReadData1 != 0) ) //Check if the value is still 0
+  begin
+    dutpassed = 0;
+    $display( "Test Case 5 Failed (register 0 broken)");
+  end
+
+  //Test Case 6
+  //Port 2 is broken and always reads register 17.
+  WriteRegister = 5'd17; //write 17 to reg 17
+  WriteData = 32'd17;
+  RegWrite = 1;
+  ReadRegister1 = 5'd17;
+  ReadRegister2 = 5'd17;
+  #5 Clk=1; #5 Clk=0;
+
+  WriteData = 32'd9; //write another number
+  for (i=0; i<16; i=i+1) //check all the registers
+  begin
+    WriteRegister = i;
+    ReadRegister1 = i;
+    ReadRegister2 = i;
+    #5 Clk=1; #5 Clk=0;
+
+    if (ReadData2 == 17)
+    begin
+      dutpassed = 0;
+      $display( "Test Case 6 Failed (port 2)"); //prints for every time in the loop
+    end
+  end
+
+  //Perfect register file
+  if (!dutpassed)
+  begin
+    $display("This is not a perfect register file. (dutpassed = 0)");
+  end
+
+  if (dutpassed)
+  begin
+    $display("This is a perfect register file. (dutpassed = 1)");
+  end
+
 
   // All done!  Wait a moment and signal test completion.
   #5
   endtest = 1;
 
 end
+
 
 endmodule
