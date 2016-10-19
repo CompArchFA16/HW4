@@ -6,6 +6,13 @@
 //   1 synchronous, positive edge triggered write port
 //------------------------------------------------------------------------------
 
+`include "decoders.v"
+`include "mux32to1by1.v"
+`include "mux32to1by32.v" 
+`include "register.v"
+`include "register32.v"
+`include "register32zero.v" 
+
 module regfile
 (
 output[31:0]	ReadData1,	// Contents of first register read
@@ -18,9 +25,12 @@ input		RegWrite,	// Enable writing of register when High
 input		Clk		// Clock (Positive Edge Triggered)
 );
 
-  // These two lines are clearly wrong.  They are included to showcase how the 
-  // test harness works. Delete them after you understand the testing process, 
-  // and replace them with your actual code.
+wire[31:0] decoder_out;
+wire[31:0] register_out;
+
+  decoder1to32 decoder (decoder_out, RegWrite, WriteRegister);
+  register32(register_out, WriteData, decoder_out, Clk);
+
   assign ReadData1 = 42;
   assign ReadData2 = 42;
 
