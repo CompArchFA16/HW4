@@ -163,6 +163,24 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  //Test Case 3
+  // See if enable is broken or ignored
+
+  //Test Case 4
+  //Testing decoder to see if all registers written to
+
+  //Test Case 5
+  //Is register 0 ever a number besides 0
+
+  //Test Case 6
+  //Port 2 always reads 17? 
+
+/*A fully perfect register file. Return True when this is detected, false for all others.
+Write Enable is broken / ignored – Register is always written to.
+Decoder is broken – All registers are written to.
+Register Zero is actually a register instead of the constant value zero.
+Port 2 is broken and always reads register 17.
+*/
 
   // All done!  Wait a moment and signal test completion.
   #5
