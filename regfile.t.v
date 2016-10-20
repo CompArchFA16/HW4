@@ -15,7 +15,6 @@ It is to your advantage to test more than just these cases to better ensure that
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
  `include "regfile.v"
-// `include "register.v"
 
 module hw4testbenchharness();
 
@@ -46,15 +45,6 @@ module hw4testbenchharness();
   );
 
 
-//Uncomment below and comment regfile DUT (above) to test the register32 module
-  // register32 DUT
-  // (
-  //   .q(ReadData1),
-  //   .d(WriteData),
-  //   .wrenable(RegWrite),
-  //   .clk(Clk)
-  // );
-
   // Instantiate test bench to test the DUT
   hw4testbench tester
   (
@@ -82,6 +72,9 @@ module hw4testbenchharness();
   // Display test results ('dutpassed' signal) once 'endtest' goes high
   always @(posedge endtest) begin
     $display("DUT passed?: %b", dutpassed);
+    if (dutpassed) begin
+        $display("Passed Perfectly");
+    end
   end
 
 endmodule
@@ -135,148 +128,130 @@ output reg		Clk
     #10
 
   // Test Case 1:
-  //   Write '42' to register 2, verify with Read Ports 1 and 2
-  //   (Passes because example register file is hardwired to return 42)
   WriteRegister = 5'd2;
   WriteData = 32'd42;
   RegWrite = 1;
   ReadRegister1 = 5'd2;
   ReadRegister2 = 5'd2;
-  #5 Clk=1; #5 Clk=0;	// Generate single clock puls
+  #5 Clk=1; #5 Clk=0;	// Generate single clock pulse
 
-  // Note that Read data 1 and 2 are not NOT 42
   if((ReadData1 != 42) || (ReadData2 != 42)) begin
-    dutpassed = 0;	// Set to 'false' on failure
+    dutpassed = 0;
     $display();
     $display("Test Case 1 Failed");
   end
-  //See if they actually are 42
-  if ((ReadData1 == 42) || (ReadData2 == 42)) begin
+  if ((ReadData1 == 42) & (ReadData2 == 42)) begin
   dutpassed= 1;
   $display("Test Case 1 Passed");
   end
-  //If they're neither
+
+  // Test Case 2:
+  //   Write '15' to register 2, verify with Read Ports 1 and 2
+  WriteRegister = 5'd2;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 15) || (ReadData2 != 15)) begin
+    dutpassed = 0;
+    $display("Test Case 2 Failed");
+  end
+  if ((ReadData1 == 15 & ReadData2 == 15)) begin
+  dutpassed = 1;
+  $display("Test Case 2 Passed");
+  end
+
+  //Test Case 3
+  // See if enable is broken or ignored, try to write to register 3 and verify with Read Ports 1 and 2 that it didn't write.
+  WriteRegister = 5'd3;
+  WriteData = 32'd26;
+  RegWrite = 0; //Enable is LOW
+  ReadRegister1 = 5'd3;
+  ReadRegister2 = 5'd3;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 26) || (ReadData2 == 26)) begin //if it wrote anyway
+    dutpassed = 0;	// Set to 'false' on failure
+    $display("Test Case 3 Failed");
+  end
   else begin
-    dutpassed= 0;
-    $display("Neither");
+  dutpassed = 1;
+  $display("Test Case 3 Passed");
+  end
+
+  //Test Case 4
+  //Decoder is broken – All registers are written to.
+  //if a register is set to the same number as it is now, it will fail this test case without reason. It will look like the decoder also wrote to that register
+  WriteRegister = 5'd4;
+  WriteData = 32'd23;
+  RegWrite = 1;
+  ReadRegister1 = 5'd4;
+  ReadRegister2 = 5'd5;
+  #5 Clk=1; #5 Clk=0;
+  if (ReadData1 == ReadData2 )begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed");
     $display("%b %b", ReadData1, ReadData2);
+  end
+  else begin
+    dutpassed = 1;
+    $display("Test Case 4 Passed");
   end
 
 
-  // // Test Case 2:
-  // //   Write '15' to register 2, verify with Read Ports 1 and 2
-  // WriteRegister = 5'd2;
-  // WriteData = 32'd15;
-  // RegWrite = 1;
-  // ReadRegister1 = 5'd2;
-  // ReadRegister2 = 5'd2;
-  // #5 Clk=1; #5 Clk=0;
-  //
-  // if((ReadData1 != 15) || (ReadData2 != 15)) begin
-  //   dutpassed = 0;
-  //   $display("Test Case 2 Failed");
-  // end
-  // if ((ReadData1 == 15 & ReadData2 == 15)) begin
-  // dutpassed = 1;
-  // $display("Test Case 2 Passed");
-  // end
-  // else begin
-  // $display("Neither");
-  // end
-  //
-  // //Test Case 3
-  // // See if enable is broken or ignored, try to write to register 3 and verify with Read Ports 1 and 2 that it didn't write.
-  // WriteRegister = 5'd3;
-  // WriteData = 32'd26;
-  // RegWrite = 0; //Enable is LOW
-  // ReadRegister1 = 5'd3;
-  // ReadRegister2 = 5'd3;
-  // #5 Clk=1; #5 Clk=0;
-  //
-  // if((ReadData1 == 26) || (ReadData2 == 26)) begin //if it wrote anyway
-  //   dutpassed = 0;	// Set to 'false' on failure
-  //   $display("Test Case 3 Failed");
-  // end
-  // else begin
-  // dutpassed = 1;
-  // $display("Test Case 3 Passed");
-  // end
+  //Test Case 5
+  //Is register 0 ever a number besides 0
+  WriteRegister = 5'd0; //try to write to address 0
+  WriteData = 32'd19;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0; //read address 0 with read register 1
+  ReadRegister2 = 5'd0; //read address 0 with read register 2
+  #5 Clk=1; #5 Clk=0;
 
-  //Test Case 4
-  //Testing decoder to see if all registers written to
-
-// $display("Still going");
-//   //Test Case 5
-//   //Is register 0 ever a number besides 0
-//   WriteRegister = 5'd0; //try to write to address 0
-//   WriteData = 32'd19;
-//   RegWrite = 1;
-//   ReadRegister1 = 5'd0; //read address 0 with read register 1
-//   ReadRegister2 = 5'd0; //read address 0 with read register 2
-//   #5 Clk=1; #5 Clk=0;
-//
-//   // if((ReadData1 == 19) || (ReadData2 == 19)) begin //if it wrote anyway
-//   //   dutpassed = 0;	// Set to 'false' on failure
-//   //   $display("Zero Address Written to, Failure");
-//   // end
-//
-//   if ((ReadData1 == 0) && (ReadData2 ==0)) begin
-//   dutpassed = 1; //pretend it's a failure
-//   $display("Both reg read zero");
-//   end
-//   else begin
-//   $display("%b, %b ", ReadData1, ReadData2);
-//   dutpassed = 0;
-//   end
+  if ((ReadData1 == 0) && (ReadData2 ==0)) begin
+  dutpassed = 1; //Pass because they both read 0
+  $display("Test Case 5 Passed");
+  end
+  else begin
+  $display("Test Case 5 Failed");
+  dutpassed = 0;
+  end
 
   //Test Case 6
   //Port 2 always reads 17?
-  // WriteRegister = 5'd2;
-  // WriteData = 32'd17;
-  // RegWrite = 1; //Enable is LOW
-  // ReadRegister1 = 5'd2;
-  // ReadRegister2 = 5'd2;
-  // #5 Clk=1; #5 Clk=0;
-  //
-  // if((ReadData1 == 17) || (ReadData2 == 17)) begin
-  //   $display("17 written to Port 2");
-  // end
-  // else begin
-  // dutpassed = 0;
-  // $display("Port 2 not being read as 17 now");
-  // end
-  //
-  // WriteRegister = 5'd2;
-  // WriteData = 32'd31;
-  // RegWrite = 1; //Enable is LOW
-  // ReadRegister1 = 5'd2;
-  // ReadRegister2 = 5'd2;
-  // #5 Clk=1; #5 Clk=0;
-  //
-  // if((ReadData1 != 17) || (ReadData2 != 17)) begin //if it wrote anyway
-  //   $display("Port 2 not reading 17");
-  //   if ((ReadData1 == 31) || (ReadData2 == 31)) begin
-  //       dutpassed = 1;
-  //       $display("Test Case 6 Passed");
-  //   end
-  // end
-  // else begin
-  // dutpassed = 0;
-  // $display("Test Case 6 Failed");
-  // end
+  WriteRegister = 5'd2;
+  WriteData = 32'd17;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
 
+  //Set them both to 17?
+  if((ReadData1 != 17) || (ReadData2 != 17)) begin
+  dutpassed = 0;
+  end
 
-/*A fully perfect register file. Return True when this is detected, false for all others.
-Write Enable is broken / ignored – Register is always written to.
-Decoder is broken – All registers are written to.
-Register Zero is actually a register instead of the constant value zero.
-Port 2 is broken and always reads register 17.
-*/
+  WriteRegister = 5'd2;
+  WriteData = 32'd31;
+  RegWrite = 1;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+  //Set it to 31
+
+    if ((ReadData1 == 31) || (ReadData2 == 31)) begin
+        dutpassed = 1;
+        $display("Test Case 6 Passed");
+    end
+  else begin
+  dutpassed = 0;
+  $display("Test Case 6 Failed");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5
   endtest = 1;
-
 end
-
 endmodule

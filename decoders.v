@@ -18,5 +18,5 @@ and the address contains the number of single bit shift operations to be
 performed. Therefore the output has the enable shifted by the amount specified
 in the address. This allows the output only be in powers of two, like:
 00000000000000000000000000000100 (address 3), 00000000000000000000000010000000
-(address 8) etc. but it selects only one register file at a time. 
+(address 8) etc. but it selects only one register file at a time.
 */
