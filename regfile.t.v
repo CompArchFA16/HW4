@@ -141,11 +141,63 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3: 
+  //   RegWrite is zero. Nothing should be written
+  //   Outputs should remain at their previous values, 15
+  WriteRegister = 5'd2;
+  WriteData = 32'd32;
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 15) || (ReadData2 != 15)) begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4: 
+  // In this test, we try to write values to register 0
+  // This should essentially be ignored and nothing should be written
+  // Both output values should be 0 if we're reading register 0
+  WriteRegister = 5'd0;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 0) || (ReadData2 != 0)) begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed");
+  end
+
 
   // All done!  Wait a moment and signal test completion.
   #5
   endtest = 1;
 
+  // Test Case 5: 
+  // In this test, Port 2 is broken and always reads register 17
+  // Because we are not writing to register 17 (and never have),
+  // the value of ReadData2 should be unset. The value of ReadData1
+  // should be 9 because we are writing 9 to register 3 in this test.
+  WriteRegister = 5'd3;
+  WriteData = 32'd9;
+  RegWrite = 1;
+  ReadRegister1 = 5'd3;
+  ReadRegister2 = 5'd17;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 != 9) || (ReadData2 != "x")) begin
+    dutpassed = 0;
+    $display("Test Case 5 Failed");
+  end
+
+
+  // All done!  Wait a moment and signal test completion.
+  #5
+  endtest = 1;
 end
 
 endmodule

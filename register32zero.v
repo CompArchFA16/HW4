@@ -8,7 +8,7 @@ input clk
 );
 
 always @(posedge clk)begin
-    q = 0;
+    q = 00000000000000000000000000000000;
 end
 
 endmodule
