@@ -1,38 +1,17 @@
-// Single-bit D Flip-Flop with enable
-//   Positive edge triggered
-// module register
-// (
-// output reg	q,
-// input		d,
-// input		wrenable,
-// input		clk
-// );
-//
-//     always @(posedge clk) begin
-//         if(wrenable) begin
-//             q = d;
-//         end
-//     end
-// endmodule
+module register
+(
+output reg	q,
+input		d,
+input		wrenable,
+input		clk
+);
 
-//32 bit D Flip Flop with enable
-//Positive edge triggered
-
-// module register32
-// (
-// output reg	[31:0] q,
-// input		[31:0] d,
-// input		wrenable,
-// input		clk
-// );
-//
-//     always @(posedge clk) begin
-//         if(wrenable) begin
-//              q = d;
-//         end
-//     end
-//
-// endmodule
+    always @(posedge clk) begin
+        if(wrenable) begin
+            q = d;
+        end
+    end
+endmodule
 
 module register32
 (
@@ -56,9 +35,6 @@ module register32
     endgenerate
 endmodule
 
-//32 bit zero output with enable
-//Positive edge triggered
-
 module register32zero
 (
 output reg	[31:0] q,
@@ -75,13 +51,14 @@ input		clk
 
 endmodule
 
-
+//Uncomment below to test the register32 or register32zero modules
 // module quicktest();
 //     reg[31:0] d;
 //     reg wrenable, clk;
 //     wire[31:0] q;
 //
-//     register32zero registermine (q, d, wrenable, clk);
+//     register32 registermine (q, d, wrenable, clk);
+// //     register32zero registermine (q, d, wrenable, clk); //Uncomment to test register32zero
 //
 //     initial begin
 //         clk = 0; #10

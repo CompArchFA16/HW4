@@ -9,7 +9,6 @@ These will be graded by instantiating intentionally broken register files with y
 
 It is to your advantage to test more than just these cases to better ensure that your good register file is actually good.  */
 
-
 //------------------------------------------------------------------------------
 // Test harness validates hw4testbench by connecting it to various functional
 // or broken register files, and verifying that it correctly identifies each
