@@ -48,4 +48,24 @@ endmodule
 
 ##Deliverable 6
 
-Explanation
+The code below describes the functionality of the decoder used in the register file.
+
+```verilog
+module decoder1to32
+(
+output[31:0]    out,
+input           enable,
+input[4:0]      address
+);
+    assign out = enable<<address; 
+endmodule
+```
+This module is meant to generate a "one-hot" bit string of length 32, the single "hot" value corresponding to the register to which we are writing. The code above has cleverly been written to take advantage of the shift operator in Verilog. The pin enable will be 1 (high) if we want to write to a register, and it will be 0 otherwise. By shifting the value of enable by the value of address (which has a value from 0 to 32), we can generate a 32-bit "one-hot" bitstring to choose our register.
+
+
+
+
+
+
+
+
