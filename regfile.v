@@ -1,7 +1,14 @@
-`include "decoders.v"
-`include "register32.v"
-`include "register32zero.v"
-`include "mux32to1by32.v"
+`ifdef _regfileAsLibrary
+  `include "regfile/decoders.v"
+  `include "regfile/register32.v"
+  `include "regfile/register32zero.v"
+  `include "regfile/mux32to1by32.v"
+`else
+  `include "decoders.v"
+  `include "register32.v"
+  `include "register32zero.v"
+  `include "mux32to1by32.v"
+`endif
 
 //------------------------------------------------------------------------------
 // MIPS register file

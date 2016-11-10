@@ -1,4 +1,8 @@
-`include "register.v"
+`ifdef _regfileAsLibrary
+  `include "regfile/register.v"
+`else
+  `include "register.v"
+`endif
 
 module register32
 (
