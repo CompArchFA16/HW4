@@ -1,7 +1,9 @@
 //------------------------------------------------------------------------------
-// Test harness validates hw4testbench by connecting it to various functional 
+// Test harness validates hw4testbench by connecting it to various functional
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
+
+`include "regfile.v"
 
 module hw4testbenchharness();
 
@@ -15,11 +17,11 @@ module hw4testbenchharness();
   wire		Clk;		// Clock (Positive Edge Triggered)
 
   reg		begintest;	// Set High to begin testing register file
+  wire    endtest;
   wire		dutpassed;	// Indicates whether register file passed tests
 
   // Instantiate the register file being tested.  DUT = Device Under Test
-  regfile DUT
-  (
+  regfile DUT(
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
     .WriteData(WriteData),
@@ -31,18 +33,17 @@ module hw4testbenchharness();
   );
 
   // Instantiate test bench to test the DUT
-  hw4testbench tester
-  (
+  hw4testbench tester(
     .begintest(begintest),
-    .endtest(endtest), 
+    .endtest(endtest),
     .dutpassed(dutpassed),
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
-    .WriteData(WriteData), 
-    .ReadRegister1(ReadRegister1), 
+    .WriteData(WriteData),
+    .ReadRegister1(ReadRegister1),
     .ReadRegister2(ReadRegister2),
     .WriteRegister(WriteRegister),
-    .RegWrite(RegWrite), 
+    .RegWrite(RegWrite),
     .Clk(Clk)
   );
 
@@ -58,9 +59,7 @@ module hw4testbenchharness();
   always @(posedge endtest) begin
     $display("DUT passed?: %b", dutpassed);
   end
-
 endmodule
-
 
 //------------------------------------------------------------------------------
 // Your HW4 test bench
@@ -93,6 +92,10 @@ output reg		Clk
 
   // Initialize register driver signals
   initial begin
+
+    $dumpfile("regfile.vcd");
+    $dumpvars;
+
     WriteData=32'd0;
     ReadRegister1=5'd0;
     ReadRegister2=5'd0;
@@ -107,42 +110,107 @@ output reg		Clk
     dutpassed = 1;
     #10
 
-  // Test Case 1: 
-  //   Write '42' to register 2, verify with Read Ports 1 and 2
-  //   (Passes because example register file is hardwired to return 42)
-  WriteRegister = 5'd2;
-  WriteData = 32'd42;
-  RegWrite = 1;
-  ReadRegister1 = 5'd2;
-  ReadRegister2 = 5'd2;
-  #5 Clk=1; #5 Clk=0;	// Generate single clock pulse
+    // Test Case 1:
+    //   Write '42' to register 2, verify with Read Ports 1 and 2
+    //   (Passes because example register file is hardwired to return 42)
+    WriteRegister = 5'd2;
+    WriteData = 32'd42;
+    RegWrite = 1;
+    ReadRegister1 = 5'd2;
+    ReadRegister2 = 5'd2;
+    #5 Clk=1; #5 Clk=0;	// Generate single clock pulse
 
-  // Verify expectations and report test result
-  if((ReadData1 != 42) || (ReadData2 != 42)) begin
-    dutpassed = 0;	// Set to 'false' on failure
-    $display("Test Case 1 Failed");
+    // Verify expectations and report test result
+    if((ReadData1 !== 42) || (ReadData2 !== 42)) begin
+      dutpassed = 0;	// Set to 'false' on failure
+      $display("Test Case 1 Failed");
+    end
+
+    // Test Case 2:
+    //   Write '15' to register 2, verify with Read Ports 1 and 2
+    //   (Fails with example register file, but should pass with yours)
+    WriteRegister = 5'd2;
+    WriteData = 32'd15;
+    RegWrite = 1;
+    ReadRegister1 = 5'd2;
+    ReadRegister2 = 5'd2;
+    #5 Clk=1; #5 Clk=0;
+
+    if((ReadData1 !== 15) || (ReadData2 !== 15)) begin
+      dutpassed = 0;
+      $display("Test Case 2 Failed");
+    end
+
+    // WRITE ENABLE ============================================================
+
+    // Test Case 3:
+    //   Do not enable write of '17' to register 2, verify with Read Ports 1 and 2
+    WriteRegister = 5'd2;
+    WriteData = 32'd17;
+    RegWrite = 1'bz;
+    ReadRegister1 = 5'd2;
+    ReadRegister2 = 5'd3;
+    #5 Clk=1; #5 Clk=0;
+
+    if(ReadData1 == 17) begin
+      dutpassed = 0;
+      $display("Test Case 3 Failed - Write enable is set to Z");
+    end
+
+    // DECODER =================================================================
+
+    // Test Case 4:
+    //   The decoder is broken. All registers are written to
+    WriteRegister = 5'd2;
+    WriteData = 32'd18;
+    RegWrite = 1'b1;
+    ReadRegister1 = 5'd5;
+    ReadRegister2 = 5'd7;
+    #5 Clk=1; #5 Clk=0;
+
+    if((ReadData1 == 18) || (ReadData2 == 18)) begin
+      dutpassed = 0;
+      $display("Test Case 4 Failed - Decoder not writing correctly");
+    end
+
+    // ZERO REGISTER ===========================================================
+
+    // Test Case 5:
+    //   Register0 is actually a register instead of the constant value 0
+    WriteRegister = 5'd0;
+    WriteData = 32'd21;
+    RegWrite = 1'b1;
+    ReadRegister1 = 5'd0;
+    #5 Clk=1; #5 Clk=0;
+
+    if(ReadData1 !== 32'b0) begin
+      dutpassed = 0;
+      $display("Test Case 5 Failed - Register 0 is not outputing 0");
+    end
+
+    // PORT 2 ==================================================================
+
+    // Test Case 6:
+    //   Port 2 is broken and always reads register 17
+    WriteRegister = 5'd17;
+    WriteData = 32'd14;
+    RegWrite = 1'b1;
+    #5 Clk=1; #5 Clk=0;
+
+    WriteRegister = 5'd5;
+    WriteData = 32'd3;
+    RegWrite = 1'b1;
+    ReadRegister1 = 5'd17;
+    ReadRegister2 = 5'd5;
+    #5 Clk=1; #5 Clk=0;
+
+    if((ReadData1 === 32'd14) && (ReadData2 === 32'd14)) begin
+      dutpassed = 0;
+      $display("Test Case 6 Failed - ReadData2 should actually be 3");
+    end
+
+    // All done!  Wait a moment and signal test completion.
+    #5
+    endtest = 1;
   end
-
-  // Test Case 2: 
-  //   Write '15' to register 2, verify with Read Ports 1 and 2
-  //   (Fails with example register file, but should pass with yours)
-  WriteRegister = 5'd2;
-  WriteData = 32'd15;
-  RegWrite = 1;
-  ReadRegister1 = 5'd2;
-  ReadRegister2 = 5'd2;
-  #5 Clk=1; #5 Clk=0;
-
-  if((ReadData1 != 15) || (ReadData2 != 15)) begin
-    dutpassed = 0;
-    $display("Test Case 2 Failed");
-  end
-
-
-  // All done!  Wait a moment and signal test completion.
-  #5
-  endtest = 1;
-
-end
-
 endmodule
